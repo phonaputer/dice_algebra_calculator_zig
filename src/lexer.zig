@@ -20,7 +20,7 @@ pub const Token = struct {
     integer: u64,
 };
 
-pub fn tokenize(allocator: std.mem.Allocator, str: []u8, err: **ErrInfo) ![]Token {
+pub fn tokenize(allocator: std.mem.Allocator, str: []u8, err_info: **ErrInfo) ![]Token {
     var tokens: std.ArrayList(Token) = .empty;
     defer tokens.deinit(allocator);
 
@@ -75,14 +75,14 @@ pub fn tokenize(allocator: std.mem.Allocator, str: []u8, err: **ErrInfo) ![]Toke
                 token_type = TokenType.close_paren;
             },
             else => {
-                err.* = try ErrInfo.init(
+                const msg = try std.fmt.allocPrint(
                     allocator,
-                    try std.fmt.allocPrint(
-                        allocator,
-                        "Unexpected character in input: {c}",
-                        .{asciiChar},
-                    ),
+                    "Unexpected character in input: {c}",
+                    .{asciiChar},
                 );
+                defer allocator.free(msg);
+                err_info.* = try ErrInfo.init(allocator, msg);
+
                 return DiceError.InvalidInput;
             },
         }
@@ -106,6 +106,17 @@ pub fn tokenize(allocator: std.mem.Allocator, str: []u8, err: **ErrInfo) ![]Toke
             .token_type = token_type,
             .integer = 0,
         });
+    }
+
+    if (ongoing_int_str.items.len > 0) {
+        try tokens.append(
+            allocator,
+            .{
+                .token_type = TokenType.number,
+                .integer = try std.fmt.parseInt(u64, ongoing_int_str.items, 10),
+            },
+        );
+        ongoing_int_str.clearRetainingCapacity();
     }
 
     return try tokens.toOwnedSlice(allocator);

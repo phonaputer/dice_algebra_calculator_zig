@@ -4,6 +4,7 @@ pub const DiceError = error{
     InvalidInput,
     BadLogic,
     OutOfMemory,
+    WriteFailed,
 };
 
 pub const ErrInfo = struct {

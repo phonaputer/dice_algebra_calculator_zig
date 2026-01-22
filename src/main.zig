@@ -3,6 +3,7 @@ const DiceError = @import("dice_error.zig").DiceError;
 const ErrInfo = @import("dice_error.zig").ErrInfo;
 const Lexer = @import("lexer.zig");
 const Parser = @import("parser.zig");
+const Executor = @import("executor.zig");
 
 fn run(
     allocator: std.mem.Allocator,
@@ -21,12 +22,10 @@ fn run(
     const tree = try Parser.parse(allocator, tokens, err_info);
     defer tree.deinit();
 
-    for (tokens) |token| {
-        try stdout.interface.print(
-            "Got token: {s}, {d}\n",
-            .{ @tagName(token.token_type), token.integer },
-        );
-    }
+    const result = try Executor.execute(allocator, tree, err_info);
+    defer result.deinit();
+
+    try stdout.interface.print("{s}\nYour result is: {d}\n", .{ result.description, result.result });
 }
 
 pub fn main() !void {

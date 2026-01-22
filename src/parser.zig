@@ -34,8 +34,8 @@ pub const MathNode = struct {
 
 pub const TreeNode = union(enum) {
     integer: IntegerNode,
-    short_roll: ShortRollNode,
-    long_roll: LongRollNode,
+    shortroll: ShortRollNode,
+    longroll: LongRollNode,
     math: MathNode,
 };
 
@@ -251,7 +251,7 @@ fn parse_longroll(allocator: std.mem.Allocator, itr: *TokenIter, err_info: **Err
     errdefer tree.deinit();
 
     tree.node = .{
-        .long_roll = .{
+        .longroll = .{
             .die = die,
             .faces = faces,
             .keep_high = null,
@@ -264,11 +264,11 @@ fn parse_longroll(allocator: std.mem.Allocator, itr: *TokenIter, err_info: **Err
         switch (token.token_type) {
             TokenType.h => {
                 _ = itr.next(); // discard h token
-                tree.node.long_roll.keep_high = try parse_integer_raw(allocator, itr, err_info);
+                tree.node.longroll.keep_high = try parse_integer_raw(allocator, itr, err_info);
             },
             TokenType.l => {
                 _ = itr.next(); // discard l token
-                tree.node.long_roll.keep_low = try parse_integer_raw(allocator, itr, err_info);
+                tree.node.longroll.keep_low = try parse_integer_raw(allocator, itr, err_info);
             },
             else => {
                 return tree;
@@ -290,7 +290,7 @@ fn parse_shortroll(allocator: std.mem.Allocator, itr: *TokenIter, err_info: **Er
     errdefer tree.deinit();
 
     tree.node = .{
-        .short_roll = .{
+        .shortroll = .{
             .faces = try parse_integer_raw(allocator, itr, err_info),
         },
     };

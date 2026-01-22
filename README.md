@@ -89,8 +89,42 @@ Your result is: 14
 
 ## How to Build Locally
 
-... coming soon ...
+To compile the `dice_algebra_calculator` binary, execute the following command from the root of this repository.
+You must have [Zig](https://ziglang.org/) installed for this to work.
+
+```
+zig build install
+```
+
+This will create a compiled binary file in the `./zig-out/bin` directory.
 
 ## Retrospective Thoughts
 
-... coming soon ...
+I have heard that Zig is intended as a competitor to C. 
+I can see what people mean when they say that.
+
+Now that I've coded this toy compiler in Zig, C, and C++, for this particular task I would rate Zig as being a lot easier than C but still significantly harder than C++. 
+
+In terms of time spent coding, Zig took a bit longer than C++ but not wildly longer. 
+By contrast this took me forever to do using C (including fixing all bugs and memory leaks).
+For incidence of memory leaks and other bugs, I had more leaks in C but I still had plenty in Zig. 
+In C++ due to the convenience of RAII and smart pointers I did not have a single memory leak.
+Just as a quick metric, the Zig code was 701 lines, C++ was 716, and C was 1456.
+
+Given those experiences, for me personally I would say Zig is a great replacement for C (if it truly shapes up in terms of performance). 
+But I would not consider it a replacement for a langauge like C++.
+That may change as Zig moves closer to its 1.0.0 release, but given the language's focus on simplicity I kinda doubt it.
+For myself, I like having the advanced features that C++ brings to the table such as OOP & exceptions.
+And those smart pointers make preventing memory leaks almost too easy. 
+(After hearing all the negative things I've heard about C++ I find it hard to believe I did not screw something up, but based on the Clang memory sanitizer and Valgrind apparently I did not. Beginner's luck?)
+I wouldn't trade easy development and error-free code for "simplicity" or cool modern syntax (it sure is cool!).
+
+One place where I would say Zig shines is the tooling. 
+Working with the Zig compiler, etc. is a lot more pleasant than monkeying around with CMake.
+Plus Zig has integrated unit tests (will update here after I try them).
+That said, CMake wasn't "terrible" and C++ has tons of libraries (including for testing) so this doesn't quite make Zig a "C++ killer" for me.
+
+At the end of the day, if I had to rate which high-level-langauge-with-manual-memory-management I'd prefer to use on a work project I'd say C++ > Zig > C.
+
+One other minor thought I had while working on this was - as a guy who writes a lot of Go at work I found a number of nice little bits of syntax in Zig that I wish were in Go (enums, `try`, exhaustive `switch` statements, etc.).
+It made me wonder if a garbage collected version of Zig would be a good Go replacement.

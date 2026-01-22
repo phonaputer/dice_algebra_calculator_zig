@@ -1,7 +1,7 @@
 .{
     .name = .dice_algebra_calculator,
     .version = "0.0.0",
-    .fingerprint = 0xdbb0bf9c300e896f, // Changing this has security and trust implications.
+    .fingerprint = 0xeb395491a905c8be, // Changing this has security and trust implications.
     .minimum_zig_version = "0.15.2",
     .dependencies = .{},
     .paths = .{

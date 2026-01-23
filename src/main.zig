@@ -9,6 +9,15 @@ fn run(
     allocator: std.mem.Allocator,
     err_info: **ErrInfo,
 ) !void {
+    var argsIterator = try std.process.ArgIterator.initWithAllocator(allocator);
+    defer argsIterator.deinit();
+
+    var verbose = false;
+    _ = argsIterator.next(); // ditch the exe file
+    if (argsIterator.next()) |arg| {
+        verbose = std.mem.eql(u8, "--v", arg);
+    }
+
     var stdin_buffer: [1024]u8 = undefined;
     var stdin = std.fs.File.stdin().reader(&stdin_buffer);
     var stdout = std.fs.File.stdout().writer(&.{});
@@ -25,7 +34,10 @@ fn run(
     const result = try Executor.execute(allocator, tree, err_info);
     defer result.deinit();
 
-    try stdout.interface.print("{s}\nYour result is: {d}\n", .{ result.description, result.result });
+    if (verbose) {
+        try stdout.interface.print("{s}\n", .{result.description});
+    }
+    try stdout.interface.print("Your result is: {d}\n", .{result.result});
 }
 
 pub fn main() !void {

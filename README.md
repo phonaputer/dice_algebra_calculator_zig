@@ -117,7 +117,7 @@ In terms of time spent coding, Zig took a bit longer than C++ but not wildly lon
 By contrast this took me forever to do using C (including fixing all bugs and memory leaks).
 For incidence of memory leaks and other bugs, I had more leaks in C but I still had plenty in Zig. 
 In C++ due to the convenience of RAII and smart pointers I did not have a single memory leak.
-Just as a quick metric, the Zig code was 701 lines, C++ was 716, and C was 1456.
+Just as a quick metric, the Zig code was 713 lines (excluding tests), C++ was 716, and C was 1456.
 
 Given those experiences, for me personally I would say Zig is a great replacement for C (if it truly shapes up in terms of performance). 
 But I would not consider it a replacement for a langauge like C++.

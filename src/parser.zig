@@ -347,3 +347,175 @@ fn validateParenBalance(allocator: std.mem.Allocator, tokens: []Token, err_info:
         return DiceError.InvalidInput;
     }
 }
+
+test "parse - unclosed open paren - returns error with message" {
+    var err_info: *ErrInfo = undefined;
+    const allocator = std.testing.allocator;
+    var input = [_]Token{
+        .{ .token_type = TokenType.open_paren, .integer = 0 },
+        .{ .token_type = TokenType.d, .integer = 0 },
+        .{ .token_type = TokenType.number, .integer = 5 },
+    };
+
+    const result = parse(allocator, input[0..], &err_info);
+
+    try std.testing.expectError(DiceError.InvalidInput, result);
+    defer err_info.deinit();
+    try std.testing.expectEqualStrings("Expression contains an unclosed parenthetical.", err_info.message);
+}
+
+test "parse - unopened close paren - returns error with message" {
+    var err_info: *ErrInfo = undefined;
+    const allocator = std.testing.allocator;
+    var input = [_]Token{
+        .{ .token_type = TokenType.d, .integer = 0 },
+        .{ .token_type = TokenType.number, .integer = 5 },
+        .{ .token_type = TokenType.close_paren, .integer = 0 },
+    };
+
+    const result = parse(allocator, input[0..], &err_info);
+
+    try std.testing.expectError(DiceError.InvalidInput, result);
+    defer err_info.deinit();
+    try std.testing.expectEqualStrings("Expression contains an unclosed parenthetical.", err_info.message);
+}
+
+test "parse - open & close paren in wrong order - returns error with message" {
+    var err_info: *ErrInfo = undefined;
+    const allocator = std.testing.allocator;
+    var input = [_]Token{
+        .{ .token_type = TokenType.close_paren, .integer = 0 },
+        .{ .token_type = TokenType.d, .integer = 0 },
+        .{ .token_type = TokenType.number, .integer = 5 },
+        .{ .token_type = TokenType.open_paren, .integer = 0 },
+    };
+
+    const result = parse(allocator, input[0..], &err_info);
+
+    try std.testing.expectError(DiceError.InvalidInput, result);
+    defer err_info.deinit();
+    try std.testing.expectEqualStrings("Invalid expression.", err_info.message);
+}
+
+test "parse - roll without faces - returns error with message" {
+    var err_info: *ErrInfo = undefined;
+    const allocator = std.testing.allocator;
+    var input = [_]Token{
+        .{ .token_type = TokenType.d, .integer = 0 },
+    };
+
+    const result = parse(allocator, input[0..], &err_info);
+
+    try std.testing.expectError(DiceError.InvalidInput, result);
+    defer err_info.deinit();
+    try std.testing.expectEqualStrings("Invalid expression.", err_info.message);
+}
+
+test "parse - longroll without faces - returns error with message" {
+    var err_info: *ErrInfo = undefined;
+    const allocator = std.testing.allocator;
+    var input = [_]Token{
+        .{ .token_type = TokenType.number, .integer = 5 },
+        .{ .token_type = TokenType.d, .integer = 0 },
+    };
+
+    const result = parse(allocator, input[0..], &err_info);
+
+    try std.testing.expectError(DiceError.InvalidInput, result);
+    defer err_info.deinit();
+    try std.testing.expectEqualStrings("Invalid expression.", err_info.message);
+}
+
+test "parse - longroll keep high without number - returns error with message" {
+    var err_info: *ErrInfo = undefined;
+    const allocator = std.testing.allocator;
+    var input = [_]Token{
+        .{ .token_type = TokenType.number, .integer = 5 },
+        .{ .token_type = TokenType.d, .integer = 0 },
+        .{ .token_type = TokenType.number, .integer = 5 },
+        .{ .token_type = TokenType.h, .integer = 0 },
+    };
+
+    const result = parse(allocator, input[0..], &err_info);
+
+    try std.testing.expectError(DiceError.InvalidInput, result);
+    defer err_info.deinit();
+    try std.testing.expectEqualStrings("Invalid expression.", err_info.message);
+}
+
+test "parse - longroll keep low without number - returns error with message" {
+    var err_info: *ErrInfo = undefined;
+    const allocator = std.testing.allocator;
+    var input = [_]Token{
+        .{ .token_type = TokenType.number, .integer = 5 },
+        .{ .token_type = TokenType.d, .integer = 0 },
+        .{ .token_type = TokenType.number, .integer = 5 },
+        .{ .token_type = TokenType.l, .integer = 0 },
+    };
+
+    const result = parse(allocator, input[0..], &err_info);
+
+    try std.testing.expectError(DiceError.InvalidInput, result);
+    defer err_info.deinit();
+    try std.testing.expectEqualStrings("Invalid expression.", err_info.message);
+}
+
+test "parse - add without left operand - returns error with message" {
+    var err_info: *ErrInfo = undefined;
+    const allocator = std.testing.allocator;
+    var input = [_]Token{
+        .{ .token_type = TokenType.add, .integer = 0 },
+        .{ .token_type = TokenType.number, .integer = 5 },
+    };
+
+    const result = parse(allocator, input[0..], &err_info);
+
+    try std.testing.expectError(DiceError.InvalidInput, result);
+    defer err_info.deinit();
+    try std.testing.expectEqualStrings("Invalid expression.", err_info.message);
+}
+
+test "parse - add without right operand - returns error with message" {
+    var err_info: *ErrInfo = undefined;
+    const allocator = std.testing.allocator;
+    var input = [_]Token{
+        .{ .token_type = TokenType.number, .integer = 5 },
+        .{ .token_type = TokenType.add, .integer = 0 },
+    };
+
+    const result = parse(allocator, input[0..], &err_info);
+
+    try std.testing.expectError(DiceError.InvalidInput, result);
+    defer err_info.deinit();
+    try std.testing.expectEqualStrings("Invalid expression.", err_info.message);
+}
+
+test "parse - multiply without left operand - returns error with message" {
+    var err_info: *ErrInfo = undefined;
+    const allocator = std.testing.allocator;
+    var input = [_]Token{
+        .{ .token_type = TokenType.multiply, .integer = 0 },
+        .{ .token_type = TokenType.number, .integer = 5 },
+    };
+
+    const result = parse(allocator, input[0..], &err_info);
+
+    try std.testing.expectError(DiceError.InvalidInput, result);
+    defer err_info.deinit();
+    try std.testing.expectEqualStrings("Invalid expression.", err_info.message);
+}
+
+test "parse - multiply without right operand - returns error with message" {
+    var err_info: *ErrInfo = undefined;
+    const allocator = std.testing.allocator;
+    var input = [_]Token{
+        .{ .token_type = TokenType.number, .integer = 5 },
+        .{ .token_type = TokenType.multiply, .integer = 0 },
+    };
+
+    const result = parse(allocator, input[0..], &err_info);
+
+    try std.testing.expectError(DiceError.InvalidInput, result);
+    defer err_info.deinit();
+    try std.testing.expectEqualStrings("Invalid expression.", err_info.message);
+}

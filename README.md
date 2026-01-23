@@ -98,6 +98,14 @@ zig build install
 
 This will create a compiled binary file in the `./zig-out/bin` directory.
 
+## How to Run the Unit Tests
+
+The unit tests can be run by executing the following command from the root of this repository.
+
+```
+zig build test --summary all
+```
+
 ## Retrospective Thoughts
 
 I have heard that Zig is intended as a competitor to C. 
@@ -120,9 +128,8 @@ And those smart pointers make preventing memory leaks almost too easy.
 I wouldn't trade easy development and error-free code for "simplicity" or cool modern syntax (it sure is cool!).
 
 One place where I would say Zig shines is the tooling. 
-Working with the Zig compiler, etc. is a lot more pleasant than monkeying around with CMake.
-Plus Zig has integrated unit tests (will update here after I try them).
-That said, CMake wasn't "terrible" and C++ has tons of libraries (including for testing) so this doesn't quite make Zig a "C++ killer" for me.
+Working with the Zig compiler, unit tests, etc. is a lot more pleasant than monkeying around with CMake.
+That said, CMake wasn't "terrible" and C++ has libraries for things like testing so this doesn't quite make Zig a "C++ killer" for me.
 
 At the end of the day, if I had to rate which high-level-langauge-with-manual-memory-management I'd prefer to use on a work project I'd say C++ > Zig > C.
 

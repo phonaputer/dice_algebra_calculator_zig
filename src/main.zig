@@ -54,3 +54,53 @@ pub fn main() !void {
         },
     };
 }
+
+test {
+    std.testing.refAllDeclsRecursive(@This());
+}
+
+test "execute - input with all the fixings - computes correct result" {
+    var err_info: *ErrInfo = undefined;
+    const allocator = std.testing.allocator;
+
+    // (10d1 + 1) * (5d1h2 - 4d1l1) / 2
+    var input = [_]Lexer.Token{
+        .{ .token_type = Lexer.TokenType.open_paren, .integer = 0 },
+        .{ .token_type = Lexer.TokenType.number, .integer = 10 },
+        .{ .token_type = Lexer.TokenType.d, .integer = 0 },
+        .{ .token_type = Lexer.TokenType.number, .integer = 1 },
+        .{ .token_type = Lexer.TokenType.add, .integer = 0 },
+        .{ .token_type = Lexer.TokenType.number, .integer = 1 },
+        .{ .token_type = Lexer.TokenType.close_paren, .integer = 0 },
+        .{ .token_type = Lexer.TokenType.multiply, .integer = 0 },
+        .{ .token_type = Lexer.TokenType.open_paren, .integer = 0 },
+        .{ .token_type = Lexer.TokenType.number, .integer = 5 },
+        .{ .token_type = Lexer.TokenType.d, .integer = 0 },
+        .{ .token_type = Lexer.TokenType.number, .integer = 1 },
+        .{ .token_type = Lexer.TokenType.h, .integer = 0 },
+        .{ .token_type = Lexer.TokenType.number, .integer = 2 },
+        .{ .token_type = Lexer.TokenType.subtract, .integer = 0 },
+        .{ .token_type = Lexer.TokenType.number, .integer = 4 },
+        .{ .token_type = Lexer.TokenType.d, .integer = 0 },
+        .{ .token_type = Lexer.TokenType.number, .integer = 1 },
+        .{ .token_type = Lexer.TokenType.l, .integer = 0 },
+        .{ .token_type = Lexer.TokenType.number, .integer = 1 },
+        .{ .token_type = Lexer.TokenType.close_paren, .integer = 0 },
+        .{ .token_type = Lexer.TokenType.divide, .integer = 0 },
+        .{ .token_type = Lexer.TokenType.number, .integer = 2 },
+    };
+
+    const parsed = try Parser.parse(allocator, input[0..], &err_info);
+    defer parsed.deinit();
+    const result = try Executor.execute(allocator, parsed, &err_info);
+    defer result.deinit();
+
+    try std.testing.expectEqual(5, result.result);
+    try std.testing.expectEqualStrings(
+        "\nRolling 10d1...\nYou rolled: 1\nYou rolled: 1\nYou rolled: 1\nYou rolled: 1\nYou rolled: 1" ++
+            "\nYou rolled: 1\nYou rolled: 1\nYou rolled: 1\nYou rolled: 1\nYou rolled: 1\n\nRolling 5d1...\n" ++
+            "You rolled: 1\nYou rolled: 1\nYou rolled: 1\nYou rolled: 1\nYou rolled: 1\n\nRolling 4d1...\n" ++
+            "You rolled: 1\nYou rolled: 1\nYou rolled: 1\nYou rolled: 1\n",
+        result.description,
+    );
+}
